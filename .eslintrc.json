@@ -1,0 +1,31 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "react-app",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2021,
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": ["error", 2],
+        "prettier/prettier": "error",
+        "react/function-component-definition": ["error", {
+            "namedComponents": "arrow-function",
+            "unnamedComponents": "arrow-function"
+          }],
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
+        "import/prefer-default-export": "off",
+        "react/prop-types": "off",
+        "no-var": "error",
+        "prefer-const": "error"
+    }
+}

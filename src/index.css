@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto';
+}
+
+body {
+    background-color: #E5E5E5 !important;
+}
+video::-webkit-media-controls-panel {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
+.MuiDataGrid-root .MuiDataGrid-columnHeaderTitleContainer .MuiDataGrid-columnHeader {
+    padding:0 16px!important;
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell {
+    padding:0 16px!important;
+}
