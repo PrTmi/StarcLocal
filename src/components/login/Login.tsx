@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Card, Button, Container, Link, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Box, Card, Button, Container, Link, TextField, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { clearState, loginUser, userSelector } from '../../state/userSlice';

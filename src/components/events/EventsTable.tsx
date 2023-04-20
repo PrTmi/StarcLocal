@@ -62,7 +62,7 @@ export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps)
     },
     { field: 'orderCount', headerName: 'Orders', flex: 0.1 },
     {
-      field: '',
+      field: 'actions',
       headerName: '',
       resizable: false,
       sortable: false,

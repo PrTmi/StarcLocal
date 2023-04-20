@@ -143,7 +143,7 @@ export const AssetsTable = ({ assets, onAugmentAsset, onViewAsset, onEdit, onArc
       }
     },
     {
-      field: '',
+      field: 'actions',
       headerName: '',
       resizable: false,
       sortable: false,

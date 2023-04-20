@@ -115,7 +115,7 @@ export const ClientsTable = ({ clients, onEdit, onArchive, onUnArchive, onView, 
       }
     },
     {
-      field: '',
+      field: 'actions',
       headerName: '',
       resizable: false,
       sortable: false,
