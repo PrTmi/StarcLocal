@@ -11,11 +11,18 @@ export enum AssetStatus {
   training_started = 'training_started'
 }
 
+export interface OrderStatusCount {
+  status: OrderStatus;
+  count: number;
+}
+
 export interface Client {
   id: string | null;
   name: string;
   archived?: boolean | null;
   contactEmail: string | null;
+  orderStatusCounts: OrderStatusCount[];
+  archivedOrdersCount: number;
 }
 
 export interface ClientToSave {
@@ -75,22 +82,16 @@ export interface UserInformation {
   accountName: string;
 }
 
-export interface OrderStats {
-  type: OrderStatus;
-  count: number;
-}
-
 export enum OrderStatus {
-  archived = 'archived',
-  requires_approval = 'requires_approval',
-  //requires_augmentation = 'requires_augmentation',
-  //requires_training = 'equires_training',
-  in_production = 'in_production',
-  delivered = 'delivered',
-  approved = 'approved'
-  //ready_for_augmentation = 'ready_for_augmentation',
-  //augment_started = 'augment_started'
-  //requires_augmentation = 'requires_augmentation'
+  Invalid = 'Invalid',
+  PendingBroadcast = 'PendingBroadcast',
+  OnAir = 'OnAir',
+  PendingContent = 'PendingContent',
+  ReadyForAnalysis = 'ReadyForAnalysis',
+  Analyzing = 'Analyzing',
+  Delivered = 'Delivered',
+  Error = 'Error',
+  Archived = 'Archived'
 }
 
 export interface EventOrder {
@@ -98,24 +99,31 @@ export interface EventOrder {
   campaignId: string | null;
   assetId: string;
   eventId: string;
-  adPlacementId: string;
+  locationPlacementIds: string[];
   status: OrderStatus;
   event?: Event;
   asset?: Asset;
-  dateCreated: string;
+  createdAt: string;
   clientId: string;
 }
 
 export interface Event {
   id: string;
   name: string;
-  dateStart: string;
-  dateEnd: string;
-  location: string;
+  startAt: string;
+  endAt: string;
+  location: Location;
   ad_Positions: string;
   broadcast: string;
   eventTypeId: string;
   status: string;
+  isOrdersAssetInSync: boolean;
+  isOrdersAssetSynchronizing: boolean;
+}
+
+export interface Location {
+  name: string;
+  imageUrl: string;
 }
 
 export interface BoundingBox {

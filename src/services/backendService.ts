@@ -6,10 +6,10 @@ import {
   Client,
   EventOrder,
   OrderReport,
-  OrderStats,
   OrderStatus,
   ReportLoadResult,
-  UserInformation
+  UserInformation,
+  OrderStatusCount
 } from '../models/models';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
@@ -22,7 +22,12 @@ type Grouping = { [key in OrderStatus]: number };
 class BackendService {
   private token: null | string;
   private backendsMap = {
-    'localhost:3000': 'https://sb-starc-wa-we-sb2-api.azurewebsites.net/api/v1',
+    'localhost:3000': 'https://dev-starc-wa-starc-api-we.azurewebsites.net/api/v2',
+    'dev.starc-dev.no': 'https://dev-api.starc-dev.no/api/v2',
+    'rel.starc-dev.no': 'https://rel-api.starc-dev.no/api/v2',
+    'stg.starc-dev.no': 'https://stg-api.starc-dev.no/api/v2',
+    'demo.starc-dev.no': 'https://demo-api.starc-dev.no/api/v2',
+    'dev-starc-wa-starc-frontend-we.azurewebsites.net': 'https://dev-starc-wa-starc-api-we.azurewebsites.net/api/v2',
     'starc-frontend.azurewebsites.net': 'https://starcweb-api.azurewebsites.net'
   } as any;
 
@@ -223,6 +228,13 @@ class BackendService {
     }
   };
 
+  // Sync event orders
+  syncEventOrders = (id: string): Promise<boolean> => {
+    return this.axios!.get(`${this.baseUrl}/events/${id}/start-orders-asset-sync`).then(it => {
+      return true;
+    });
+  };
+
   // Orders
   loadEventOrders = async (id: string): Promise<EventOrder[]> => {
     try {
@@ -263,14 +275,22 @@ class BackendService {
     });
   };
 
-  loadOrdersStats = async (): Promise<Array<OrderStats>> => {
-    const allOrders = await this.loadOrders(null);
+  loadOrdersStats = async (): Promise<Array<OrderStatusCount>> => {
+    const allClients = await this.loadClients(null);
 
-    const groupedOrders = allOrders.reduce((pv: Grouping, cv: EventOrder) => {
-      if (pv[cv.status] == null) {
-        pv[cv.status] = 0;
+    const groupedOrders = allClients.reduce((pv: Grouping, cv) => {
+      if (pv[OrderStatus.Archived] == null) {
+        pv[OrderStatus.Archived] = 0;
       }
-      pv[cv.status] = pv[cv.status] + 1;
+
+      cv.orderStatusCounts.forEach(it => {
+        if (pv[it.status] == null) {
+          pv[it.status] = 0;
+        }
+        pv[it.status] = pv[it.status] + it.count;
+      });
+
+      pv[OrderStatus.Archived] = pv[OrderStatus.Archived] + cv.archivedOrdersCount;
       return pv;
     }, {} as Grouping);
 
@@ -284,7 +304,7 @@ class BackendService {
 
     // @ts-ignore
     return Object.keys(groupedOrders).map((s: OrderStatus) => {
-      return { type: s, count: groupedOrders[s] as number } as OrderStats;
+      return { status: s, count: groupedOrders[s] as number } as OrderStatusCount;
     });
   };
 
@@ -300,14 +320,14 @@ class BackendService {
 
   async loadReport(id: string): Promise<ReportLoadResult> {
     const [{ data: report }, { data: boxes }] = await Promise.all([
-      this.axios!.get<OrderReport>(`${this.baseUrl}/${id}/prediction-result`),
-      this.axios!.get<any>(`${this.baseUrl}/${id}/prediction-result/bounding-boxes`)
+      this.axios!.get<OrderReport>(`${this.baseUrl}/orders/${id}/prediction-result`),
+      this.axios!.get<any>(`${this.baseUrl}/orders/${id}/prediction-result/bounding-boxes`)
     ]);
 
     return {
       report,
       boxes: boxes.map((it: any) => {
-        return it.boundingBoxesDTOs.filter((it: BoundingBox) => it.probability * 100 >= report.minimumProbabilityPercentage);
+        return it.boundingBoxesDtos.filter((it: BoundingBox) => it.probability * 100 >= report.minimumProbabilityPercentage);
       })
     } as ReportLoadResult;
   }

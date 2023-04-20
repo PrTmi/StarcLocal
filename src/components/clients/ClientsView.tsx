@@ -8,13 +8,13 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { ClientDetailsDialog } from './ClientDetailsDialog';
+import { AppDispatch } from '../../state/store';
 
 import Collapse from '@mui/material/Collapse';
 import GroupIcon from '@mui/icons-material/Group';
 import { ClientsTable } from './ClientsTable';
 import { EmptyStateComponent } from '../shared/EmptyStateComponent';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../state/store';
 
 export const ClientsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
@@ -53,7 +53,6 @@ export const ClientsView = (): JSX.Element => {
 
   const closeDetailsDialog = () => {
     setDetailsOpen(false);
-    dispatch(fetchClientsByQuery());
   };
 
   const showDetails = (c: Client, routeName: string) => {
@@ -64,10 +63,10 @@ export const ClientsView = (): JSX.Element => {
     <>
       <Box pb={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant='h5' sx={{ lineHeight: 1.5 }}>
-          Clients
+          Advertisers
         </Typography>
         <Button variant='outlined' onClick={createClient}>
-          New client
+          New advertiser
         </Button>
       </Box>
       {!isLoading ? (
@@ -101,9 +100,9 @@ export const ClientsView = (): JSX.Element => {
         }}
       >
         {clients.filter((it: any) => it.archived).length > 1 || clients.filter((it: any) => it.archived).length === 0 ? (
-          <Typography>{clients.filter((it: Client) => it.archived).length} ARCHIVED CLIENTS</Typography>
+          <Typography>{clients.filter((it: Client) => it.archived).length} ARCHIVED ADVERTISERS</Typography>
         ) : (
-          <Typography>{clients.filter((it: Client) => it.archived).length} ARCHIVED CLIENT</Typography>
+          <Typography>{clients.filter((it: Client) => it.archived).length} ARCHIVED ADVERTISER</Typography>
         )}
         <IconButton aria-label='expand row' size='small'>
           {open && clients.filter((it: Client) => it.archived).length > 0 ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}

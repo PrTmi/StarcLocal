@@ -4,9 +4,9 @@ import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, 
 import { augmentAsset } from '../../state/assetsSlice';
 import { useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
+import { AppDispatch } from '../../state/store';
 // @ts-ignore
 import { Image } from 'mui-image';
-import { AppDispatch } from '../../state/store';
 
 type AugmentAssetDialogProps = {
   onClose: () => void;

@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Filler, Chart } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { OrderReport } from '../../models/models';
+import { OrderReport } from '../../../models/models';
 import { getRelativePosition } from 'chart.js/helpers';
-import { formatSeconds } from './OrderDetailsView';
+import { formatSeconds } from '../OrderDetailsView';
 
 ChartJS.register(LinearScale, LineElement, Tooltip, PointElement, Filler);
 
@@ -76,7 +76,7 @@ type GraphProps = {
   onSeek: (pos: number) => void;
 };
 
-export const Graph = ({ report, currentPosition, onSeek }: GraphProps) => {
+export const GraphComponent = ({ report, currentPosition, onSeek }: GraphProps) => {
   const chartRef = useRef();
 
   useEffect(() => {

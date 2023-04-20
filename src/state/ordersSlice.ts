@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BoundingBox, EventOrder, OrderReport, OrderStats, OrderStatus } from '../models/models';
+import { BoundingBox, EventOrder, OrderReport, OrderStatus, OrderStatusCount } from '../models/models';
 import backendService from '../services/backendService';
-import { Asset } from '../models/models';
+import { Asset, Client } from '../models/models';
 
 const prefix = 'orders';
 
@@ -9,14 +9,15 @@ const initialState = {
   isLoading: false,
   isStatsLoading: false,
   ordersStats: Object.keys(OrderStatus).map(it => {
-    return { type: it, count: -1 } as OrderStats;
+    return { status: it, count: -1 } as OrderStatusCount;
   }),
   orderDetails: null as EventOrder | null,
   boxes: [] as BoundingBox[][],
   orders: [] as EventOrder[],
   savingOrder: false,
   selectedAsset: null as Asset | null,
-  selectedPlacement: null as string | null,
+  selectedClient: null as Client | null,
+  selectedPlacements: [] as string[] | null,
   errorSavingOrder: false,
   report: null as OrderReport | null
 };
@@ -49,16 +50,21 @@ export const ordersSlice = createSlice({
   name: prefix,
   initialState,
   reducers: {
-    setSelectedAsset(state, action: PayloadAction<Asset>) {
+    setSelectedAsset(state, action: PayloadAction<Asset | null>) {
       state.selectedAsset = action.payload;
     },
-    setSelectedPlacement(state, action: PayloadAction<string>) {
-      state.selectedPlacement = action.payload;
+    setSelectedClient(state, action: PayloadAction<Client>) {
+      state.selectedClient = action.payload;
+    },
+
+    setSelectedPlacements(state, action: PayloadAction<string[]>) {
+      state.selectedPlacements = action.payload;
     },
     resetOrderSave(state) {
       state.savingOrder = false;
       state.selectedAsset = null;
-      state.selectedPlacement = null;
+      state.selectedClient = null;
+      state.selectedPlacements = [];
       state.errorSavingOrder = false;
     }
   },
@@ -99,9 +105,11 @@ export const ordersSlice = createSlice({
         state.errorSavingOrder = true;
       })
       .addCase(fetchOrderDetails.pending, state => {
+        state.isLoading = true;
         state.report = null;
       })
       .addCase(fetchOrderDetails.fulfilled, (state, { payload }) => {
+        state.isLoading = false;
         state.orderDetails = payload;
       });
   }
@@ -109,6 +117,6 @@ export const ordersSlice = createSlice({
 
 export default ordersSlice.reducer;
 
-export const { setSelectedAsset, setSelectedPlacement, resetOrderSave } = ordersSlice.actions;
+export const { setSelectedAsset, setSelectedClient, setSelectedPlacements, resetOrderSave } = ordersSlice.actions;
 
 export const ordersSelector = (state: any) => state.orders;

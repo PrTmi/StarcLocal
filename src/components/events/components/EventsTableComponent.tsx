@@ -1,9 +1,11 @@
 import React from 'react';
-import { Button, Link, Stack, Typography } from '@mui/material';
+import { Button, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Event } from '../../models/models';
-import { formatDate, formatTime } from '../../services/formatting';
+import { Event } from '../../../models/models';
+import { formatDate, formatTime } from '../../../services/formatting';
 import { grey } from '@mui/material/colors';
+// @ts-ignore
+import { DateTime } from 'luxon';
 
 type EventsTableProps = {
   events: Event[];
@@ -11,8 +13,9 @@ type EventsTableProps = {
   onCreateOrder: (e: Event) => void;
 };
 
-export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps): JSX.Element => {
-  const [pageSize, setPageSize] = React.useState(10);
+export const EventsTableComponent = ({ events, onOpen, onCreateOrder }: EventsTableProps): JSX.Element => {
+  const [pageSize, setPageSize] = React.useState(15);
+  const now = DateTime.now();
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -22,14 +25,14 @@ export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps)
       renderCell: (params: GridRenderCellParams) => {
         const st = params.formattedValue as Event;
         return (
-          <Link component='button' variant='body2' onClick={() => onOpen(params.row as Event)}>
+          <Link component='button' variant='body2' onClick={() => onOpen(params.row as Event)} align='left'>
             {st}
           </Link>
         );
       }
     },
     {
-      field: 'dateStart',
+      field: 'startAt',
       headerName: 'Broadcast time',
       flex: 0.1,
       renderCell: (params: GridRenderCellParams) => {
@@ -48,8 +51,9 @@ export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps)
       field: 'broadcaster',
       headerName: 'Broadcaster',
       flex: 0.1,
+      //  Hardcoded Broadcast to TV2
       renderCell: (params: GridRenderCellParams) => {
-        return params.row.broadcaster ? params.row.broadcaster : '-';
+        return params.row.broadcaster ? params.row.broadcaster : 'TV2';
       }
     },
     {
@@ -57,7 +61,7 @@ export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps)
       headerName: 'Placements available',
       flex: 0.1,
       renderCell: (params: GridRenderCellParams) => {
-        return params.row.ad_Placements ? params.row.ad_Placements : '-';
+        return params.row.location.availablePlacements ? params.row.location.availablePlacements : '-';
       }
     },
     { field: 'orderCount', headerName: 'Orders', flex: 0.1 },
@@ -69,7 +73,21 @@ export const EventsTable = ({ events, onOpen, onCreateOrder }: EventsTableProps)
       align: 'right',
       flex: 0.2,
       renderCell: (params: GridRenderCellParams) => {
-        return <Button onClick={() => onCreateOrder(params.row as Event)}>Create order</Button>;
+        return params.row.location.availablePlacements && DateTime.fromISO(params.row.startAt) > now ? (
+          <Button onClick={() => onCreateOrder(params.row as Event)}>Create order</Button>
+        ) : (
+          <Tooltip
+            title={DateTime.fromISO(params.row.startAt) < now ? 'Event is closed for new orders' : 'No placements available for this event'}
+            placement='left'
+            arrow
+          >
+            <div>
+              <Button onClick={() => onCreateOrder(params.row as Event)} disabled>
+                Create order
+              </Button>
+            </div>
+          </Tooltip>
+        );
       }
     }
   ];

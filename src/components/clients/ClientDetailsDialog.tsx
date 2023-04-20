@@ -34,7 +34,7 @@ export const ClientDetailsDialog = ({ onClose, open, clientId, scroll }: ClientP
             <CloseIcon />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant='h6' component='div'>
-            {clientId === 'new' ? 'New client' : 'Edit client'}
+            {clientId === 'new' ? 'New advertiser' : 'Edit advertiser'}
           </Typography>
         </Toolbar>
       </AppBar>

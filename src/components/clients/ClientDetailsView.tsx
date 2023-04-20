@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Button, Container, FormControl, FormHelperText, LinearProgress, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { clientsSelector, fetchClientDetails, saveClient } from '../../state/clientsSlice';
+import { clientsSelector, fetchClientDetails, fetchClientsByQuery, saveClient } from '../../state/clientsSlice';
 import { LoadingButton } from '@mui/lab';
 import { ChangeEvent } from 'react';
 import { AppDispatch } from '../../state/store';
@@ -20,9 +20,7 @@ type ClientDetailsProps = {
 export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const { clientDetails, savingClient, savingClientDone, isLoading } = useSelector(clientsSelector);
-  const [nameExpanded, setNameExpanded] = useState<boolean>(true);
-  const [emailExpanded, setEmailExpanded] = useState<boolean>(true);
-
+  const [expandedPanel, setExpandedPanel] = useState<boolean | string>('client' ? clientId === 'new' : '');
   const [clientName, setClientName] = useState<string>('');
   const [clientNameTouched, setClientNameTouched] = useState<boolean>(false);
   const [clientEmail, setClientEmail] = useState<string>('');
@@ -64,15 +62,12 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
 
   const handleSave = async () => {
     await dispatch(saveClient({ id: clientDetails.id, name: clientName, contactEmail: clientEmail }));
+    dispatch(fetchClientsByQuery());
     onClose();
   };
 
-  const toggleName = () => {
-    setNameExpanded(!nameExpanded);
-  };
-
-  const toggleImage = () => {
-    setEmailExpanded(!emailExpanded);
+  const handlePanelChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpandedPanel(newExpanded ? panel : false);
   };
 
   const closeDialog = () => {
@@ -85,20 +80,22 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
     <Container component='main' maxWidth='md' sx={{ pt: 12 }}>
       {!isLoading ? (
         <>
-          <Accordion sx={{ pt: 2, pb: 2 }} expanded={nameExpanded} onChange={() => toggleName()}>
+          <Accordion sx={{ pt: 2, pb: 2 }} expanded={expandedPanel === 'client' || expandedPanel === true} onChange={handlePanelChange('client')}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='name-content' id='name-header'>
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>Client name</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Add a descriptive name for your client</Typography>
+              <Typography sx={{ width: '33%', flexShrink: 0 }}>Advertiser name</Typography>
+
+              <Typography sx={{ color: 'text.secondary' }}>
+                {(expandedPanel && expandedPanel !== 'email') || clientName.length === 0 ? 'Add a descriptive name for your advertiser' : clientName}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <FormControl sx={{ width: 300 }}>
                 <TextField
-                  focused
                   autoFocus
                   variant='standard'
                   required
                   id='clientName'
-                  label='Client name'
+                  label='Advertiser name'
                   name='clientName'
                   value={clientName}
                   onBlur={() => setClientNameTouched(true)}
@@ -111,6 +108,7 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
                     maxLength: 32
                   }}
                 />
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <FormHelperText sx={{ justifyContent: 'left', marginLeft: 0 }} id='clientNameLength'>
                     Max characters: 32
@@ -121,7 +119,7 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
                 </Box>
                 {clientNameTouched && !clientName ? (
                   <Typography sx={{ color: 'error.main' }} align='left' gutterBottom>
-                    Please enter a client name
+                    Please enter a advertiser name
                   </Typography>
                 ) : (
                   <div style={{ minHeight: 32 }}>&nbsp;</div>
@@ -129,10 +127,13 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
               </FormControl>
             </AccordionDetails>
           </Accordion>
-          <Accordion sx={{ pt: 2, pb: 2 }} expanded={emailExpanded} onChange={() => toggleImage()}>
+          <Accordion sx={{ pt: 2, pb: 2 }} expanded={expandedPanel === 'email'} onChange={handlePanelChange('email')}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='image-content' id='image-header'>
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>Client email</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Add an email address for this client</Typography>
+              <Typography sx={{ width: '33%', flexShrink: 0 }}>Advertiser email</Typography>
+
+              <Typography sx={{ color: 'text.secondary' }}>
+                {(expandedPanel && expandedPanel !== 'client') || clientEmail.length === 0 ? 'Add an email address for this advertiser' : clientEmail}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <FormControl sx={{ width: 300 }}>
@@ -140,7 +141,7 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
                   variant='standard'
                   required
                   id='clientEmail'
-                  label='Client email address'
+                  label='Advertiser email address'
                   name='clientEmail'
                   value={clientEmail}
                   onBlur={() => setClientEmailTouched(true)}
@@ -164,7 +165,7 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
             variant='contained'
             disabled={!clientName || !clientEmail || error === 'Email is invalid' || !changed}
           >
-            Save client
+            Save advertiser
           </LoadingButton>
           <Button variant='text' sx={{ mt: 3, mb: 2, ml: 3 }} onClick={closeDialog}>
             Cancel

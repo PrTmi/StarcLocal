@@ -11,13 +11,10 @@ import ListItemText from '@mui/material/ListItemText';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import { loadOrdersStats, ordersSelector } from '../state/ordersSlice';
-import { OrderStats, OrderStatus } from '../models/models';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
-import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
+import { OrderStatus, OrderStatusCount } from '../models/models';
 import GroupIcon from '@mui/icons-material/Group';
 import { Skeleton } from '@mui/material';
+import { orderTypesMapping } from '../services/orderTypesMapping';
 import { AppDispatch } from '../state/store';
 
 const drawerWidth = 320;
@@ -51,15 +48,6 @@ type MenuProps = {
   open: boolean;
 };
 
-export const orderTypesMapping = {
-  [OrderStatus.archived]: { label: 'Archived', position: 100, icon: <FolderOpenIcon /> },
-  [OrderStatus.requires_approval]: { label: 'Pending review', position: 1, icon: <HourglassTopIcon /> },
-  [OrderStatus.in_production]: { label: 'In production', position: 20, icon: <PlaylistPlayIcon /> },
-  [OrderStatus.delivered]: { label: 'Delivered', position: 40, icon: <PlaylistAddCheckIcon /> },
-  [OrderStatus.approved]: { label: 'In production', position: 30, icon: <PlaylistPlayIcon /> }
-  //[OrderStatus.requires_augmentation]: { label: 'Requires augmentation', icon: <PlaylistPlayIcon /> }
-};
-
 export const MainMenu = ({ open }: MenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,16 +67,16 @@ export const MainMenu = ({ open }: MenuProps) => {
     navigate(`/${path}`);
   };
 
-  const createOrderStatsButton = (o: OrderStats) => {
+  const createOrderStatsButton = (def: any, o: OrderStatusCount) => {
     return (
       <ListItemButton
-        key={o.type.toUpperCase()}
-        onClick={() => openOrders(o.type)}
-        selected={location.pathname.startsWith('/orders/' + o.type)}
+        key={o.status.toUpperCase()}
+        onClick={() => openOrders(o.status)}
+        selected={location.pathname.startsWith('/orders/' + o.status)}
         sx={{ paddingLeft: '20px' }}
       >
-        <ListItemIcon>{orderTypesMapping[o.type].icon}</ListItemIcon>
-        <ListItemText primary={orderTypesMapping[o.type].label} />
+        <ListItemIcon>{def.icon}</ListItemIcon>
+        <ListItemText primary={def.label} />
         {open ? (
           <ListItemSecondaryAction style={{ paddingRight: 8 }}>
             {isStatsLoading ? (
@@ -102,19 +90,20 @@ export const MainMenu = ({ open }: MenuProps) => {
     );
   };
 
-  const ordersPanel = (ordersStats: OrderStats[]) => {
+  const ordersPanel = (ordersStats: OrderStatusCount[]) => {
     return ordersStats.length > 0 ? (
       <>
-        <Divider sx={{ my: 1 }} />
+        <Divider sx={{ mt: 2, mb: 1 }} />
         <ListSubheader component='div' inset style={{ paddingLeft: 20, visibility: !open ? 'hidden' : 'visible' }}>
           Orders
         </ListSubheader>
-        {ordersStats
-          .filter(it => it.type !== OrderStatus.in_production)
-          .sort((a: OrderStats, b: OrderStats) => {
-            return orderTypesMapping[a.type].position - orderTypesMapping[b.type].position;
+
+        {orderTypesMapping
+          .filter(it => it.showInMenu)
+          .sort((a, b) => {
+            return a.menuPosition - b.menuPosition;
           })
-          .map((it: OrderStats) => createOrderStatsButton(it))}
+          .map(it => createOrderStatsButton(it, ordersStats.find(stat => it.status === stat.status) as OrderStatusCount))}
       </>
     ) : null;
   };
@@ -122,11 +111,20 @@ export const MainMenu = ({ open }: MenuProps) => {
   return (
     <Drawer variant='permanent' open={open}>
       <List component='nav'>
+        <ListItemButton onClick={() => openView('events')} selected={location.pathname.startsWith('/events')} sx={{ paddingLeft: '20px', marginTop: '8px' }}>
+          <ListItemIcon>
+            <OndemandVideoIcon />
+          </ListItemIcon>
+          <ListItemText primary='Events' />
+        </ListItemButton>
+
+        <Divider sx={{ my: 2 }} />
+
         <ListItemButton onClick={() => openView('clients')} selected={location.pathname.startsWith('/clients')} sx={{ paddingLeft: '20px' }}>
           <ListItemIcon>
             <GroupIcon />
           </ListItemIcon>
-          <ListItemText primary='Clients' />
+          <ListItemText primary='Advertisers' />
         </ListItemButton>
 
         <ListItemButton onClick={() => openView('assets')} selected={location.pathname.startsWith('/assets')} sx={{ paddingLeft: '20px' }}>
@@ -134,13 +132,6 @@ export const MainMenu = ({ open }: MenuProps) => {
             <PermMediaIcon />
           </ListItemIcon>
           <ListItemText primary='Assets' />
-        </ListItemButton>
-
-        <ListItemButton onClick={() => openView('events')} selected={location.pathname.startsWith('/events')} sx={{ paddingLeft: '20px' }}>
-          <ListItemIcon>
-            <OndemandVideoIcon />
-          </ListItemIcon>
-          <ListItemText primary='Events' />
         </ListItemButton>
 
         {isStatsLoading && ordersStats.length === 0 ? <LinearProgress /> : ordersPanel(ordersStats)}

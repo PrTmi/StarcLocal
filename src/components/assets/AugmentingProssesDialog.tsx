@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Asset } from '../../models/models';
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, LinearProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import augmentImg from '../../images/augmentImg.gif';
+import augmentImg from '../../images/augmenting.gif';
 // @ts-ignore
 import { Image } from 'mui-image';
 
@@ -35,7 +35,7 @@ export const AugmentingProssessDialog = ({ onClose, asset, open }: AugmentAssetD
         <Alert severity='info'>
           To advertise with your asset, it needs augmentation to prepare for accurate prediction of how your ad performs in a broadcast.
         </Alert>
-        <Box sx={{ height: '250px', width: '400px', mt: 3 }}>
+        <Box sx={{ height: '250px', mt: 3 }}>
           <Image sx={{ width: '100%', height: '100%' }} src={augmentImg} showLoading />
         </Box>
       </DialogContent>

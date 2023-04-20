@@ -1,7 +1,5 @@
 import React from 'react';
-//import ReactDOM from 'react-dom/client';
 import ReactDOM from 'react-dom';
-
 import './index.css';
 import App from './App';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -14,8 +12,6 @@ import { msalConfig } from './msalConfig';
 
 const theme = createTheme();
 const msalInstance = new PublicClientApplication(msalConfig());
-
-//const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 ReactDOM.render(
   <React.StrictMode>
@@ -30,15 +26,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-/*root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <MsalProvider instance={msalInstance}>
-        <CssBaseline />
-        <ThemeProvider theme={theme}>
-          <App />
-        </ThemeProvider>
-      </MsalProvider>
-    </Provider>
-  </React.StrictMode>
-);*/

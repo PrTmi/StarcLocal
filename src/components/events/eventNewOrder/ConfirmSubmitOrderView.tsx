@@ -1,31 +1,43 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, CircularProgress, Collapse, Stack, Typography } from '@mui/material';
-import { grey } from '@mui/material/colors';
+import { Chip, CircularProgress, Collapse, Grid, Stack, Typography } from '@mui/material';
+import { blue, grey } from '@mui/material/colors';
 import Container from '@mui/material/Container';
-import { EventHeader } from '../EventHeader';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { createOrder, loadOrdersStats, ordersSelector } from '../../../state/ordersSlice';
 import { Event, EventOrder } from '../../../models/models';
 import Button from '@mui/material/Button';
 import { AssetDetailsComponent } from '../../shared/AssetDetailsComponent';
-import { PlacementDetailsComponent } from '../../shared/PlacementDetailsComponent';
+import { eventsSelector } from '../../../state/eventsSlice';
+import { EventDetailsComponent } from './components/EventDetailsComponent';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import { AppDispatch } from '../../../state/store';
+
+// @ts-ignore
+import { Image } from 'mui-image';
 
 type ConfirmOrderProps = {
   event: Event;
   goBack: () => void;
-  onClose: () => void;
+  onClose: (refresh: boolean) => void;
 };
 
-export const ConfirmOrder = ({ event, goBack, onClose }: ConfirmOrderProps): JSX.Element => {
+export const ConfirmSubmitOrderView = ({ event, goBack, onClose }: ConfirmOrderProps): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedAsset, selectedPlacement, savingOrder } = useSelector(ordersSelector);
-
+  const { selectedAsset, selectedPlacements, savingOrder } = useSelector(ordersSelector);
   const [saved, setSaved] = useState<boolean>(false);
+  const { eventDetails } = useSelector(eventsSelector);
+
+  let placementsMap = {} as any;
+
+  if (eventDetails?.location?.locationPlacements.length > 0) {
+    placementsMap = eventDetails.location.locationPlacements.reduce((prev: any, curr: any) => {
+      prev[curr.id] = curr.name;
+      return prev;
+    }, {});
+  }
 
   const handleSave = async () => {
     await dispatch(
@@ -35,7 +47,7 @@ export const ConfirmOrder = ({ event, goBack, onClose }: ConfirmOrderProps): JSX
         clientId: selectedAsset.clientId,
         eventId: event.id,
         campaignId: null,
-        adPlacementId: event.id
+        locationPlacementIds: selectedPlacements
       } as EventOrder)
     );
     dispatch(loadOrdersStats());
@@ -44,7 +56,7 @@ export const ConfirmOrder = ({ event, goBack, onClose }: ConfirmOrderProps): JSX
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box flexGrow={1}>
       {!savingOrder ? (
         <Stack direction='row' spacing={2} display='flex' alignItems='center'>
           <Collapse orientation='horizontal' in={saved} timeout={1000}>
@@ -79,37 +91,48 @@ export const ConfirmOrder = ({ event, goBack, onClose }: ConfirmOrderProps): JSX
       )}
 
       <Container sx={{ backgroundColor: grey[200], pt: 2, pb: 2, borderRadius: '4px' }}>
-        <Typography>EVENT</Typography>
-        <Typography variant='h6' mt={1} mb={2}>
-          {event.name}
-        </Typography>
+        <Grid container spacing={3}>
+          <Grid item sm={6}>
+            <EventDetailsComponent event={event} />
+          </Grid>
+          <Grid item sm={6}>
+            <Container sx={{ backgroundColor: '#ffffff', pt: 2, pb: 2, borderRadius: '4px' }}>
+              <Typography sx={{ mb: 1.5 }} color='text.secondary'>
+                ASSET
+              </Typography>
+              <AssetDetailsComponent
+                asset={selectedAsset}
+                fontSize={20}
+                spacing={4}
+                sizeStyles={{ height: '60px', width: 'auto', maxHeight: '60px' }}
+                clientName={true}
+              />
 
-        <EventHeader event={event} />
+              <Typography sx={{ mb: 1.5, pt: 3 }} color='text.secondary'>
+                PLACEMENTS
+              </Typography>
+              {selectedPlacements.map((id: string) => (
+                <Chip key={placementsMap[id]} label={placementsMap[id]} variant='outlined' sx={{ color: blue[500], borderColor: blue[500], mr: 1 }} />
+              ))}
 
-        <Stack direction='row' spacing={4} justifyContent='space-between' mt={3}>
-          <Card sx={{ background: '#ffffff', width: '50%', p: 3, boxShadow: '0px 2px 1px -1px rgb(0 0 0 / 20%)' }}>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              ASSET
-            </Typography>
-            <AssetDetailsComponent asset={selectedAsset} fontSize={20} spacing={4} sizeStyles={{ height: '120px', width: 'auto', maxHeight: '120px' }} />
-          </Card>
-
-          <Card sx={{ background: '#ffffff', width: '50%', p: 3, boxShadow: '0px 2px 1px -1px rgb(0 0 0 / 20%)' }}>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              PLACEMENT
-            </Typography>
-            <PlacementDetailsComponent placement={selectedPlacement} />
-          </Card>
-        </Stack>
+              <Box sx={{ pt: 2 }}>
+                {selectedPlacements ? (
+                  <Image fit='contain' src={event.location.imageUrl} showLoading />
+                ) : (
+                  <BrokenImageIcon sx={{ color: grey[300], fontSize: 100 }} />
+                )}
+              </Box>
+            </Container>
+          </Grid>
+        </Grid>
       </Container>
-
       <Box sx={{ display: 'flex', pt: 2 }}>
         {saved ? (
-          <Button color='primary' sx={{ mr: 1 }} disabled={savingOrder} onClick={onClose} variant='contained'>
+          <Button color='primary' sx={{ mr: 1 }} disabled={savingOrder} onClick={e => onClose(true)} variant='contained'>
             Close
           </Button>
         ) : (
-          <Button sx={{ mr: 1 }} disabled={savingOrder} onClick={onClose}>
+          <Button sx={{ mr: 1 }} disabled={savingOrder} onClick={e => onClose(saved)}>
             {saved ? 'Close' : 'Cancel'}
           </Button>
         )}

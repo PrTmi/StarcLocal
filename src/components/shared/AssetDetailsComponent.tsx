@@ -4,6 +4,8 @@ import React from 'react';
 import { Box, Stack } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+import { useSelector } from 'react-redux';
+import { ordersSelector } from '../../state/ordersSlice';
 
 // @ts-ignore
 import { Image } from 'mui-image';
@@ -13,9 +15,12 @@ interface AssetProps {
   fontSize: number;
   spacing: number;
   sizeStyles: SxProps;
+  clientName: boolean;
 }
 
-export const AssetDetailsComponent = ({ asset, fontSize, spacing, sizeStyles }: AssetProps): JSX.Element => {
+export const AssetDetailsComponent = ({ asset, fontSize, spacing, sizeStyles, clientName }: AssetProps): JSX.Element => {
+  const { selectedClient } = useSelector(ordersSelector);
+
   return (
     <>
       {asset == null ? null : (
@@ -28,9 +33,16 @@ export const AssetDetailsComponent = ({ asset, fontSize, spacing, sizeStyles }: 
               <Typography variant='h5' fontSize={fontSize}>
                 {asset.name}
               </Typography>
-              <Typography fontSize={14} color={grey[800]}>
-                {asset.fileFullName}
-              </Typography>
+
+              {!clientName ? (
+                <Typography fontSize={14} color={grey[800]}>
+                  {asset.fileFullName}
+                </Typography>
+              ) : (
+                <Typography fontSize={14} color={grey[800]}>
+                  {selectedClient ? selectedClient.name : null}
+                </Typography>
+              )}
             </Box>
           </Stack>
         </>

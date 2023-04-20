@@ -6,29 +6,41 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Checkbox, FormControlLabel, FormGroup, Stack } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import footballFieldNoPlace from '../../../images/foorballFieldNoPlace.svg';
-import footballField from '../../../images/footballField.svg';
-import { ordersSelector, setSelectedPlacement } from '../../../state/ordersSlice';
+import { ordersSelector, setSelectedPlacements } from '../../../state/ordersSlice';
+import { eventsSelector } from '../../../state/eventsSlice';
+import { grey } from '@mui/material/colors';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+import { AppDispatch } from '../../../state/store';
 
 // @ts-ignore
 import { Image } from 'mui-image';
-import { AppDispatch } from '../../../state/store';
 
-export const SelectPlacement = (): JSX.Element => {
+export const SelectPlacementView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [nameExpanded, setNameExpanded] = React.useState<boolean>(true);
 
-  const { selectedPlacement } = useSelector(ordersSelector);
+  const { selectedPlacements } = useSelector(ordersSelector);
 
-  const onSelectedPlacement = (event: React.ChangeEvent<HTMLElement>, placement: string) => {
-    const val = selectedPlacement === placement ? '' : placement;
-    dispatch(setSelectedPlacement(val));
+  const { eventDetails } = useSelector(eventsSelector);
+
+  const onSelectedPlacements = (event: React.SyntheticEvent) => {
+    let val = [...selectedPlacements];
+    if ((event.target as HTMLInputElement).checked) {
+      val = [...selectedPlacements, (event.target as HTMLInputElement).value];
+    } else {
+      val.splice(selectedPlacements.indexOf((event.target as HTMLInputElement).value), 1);
+    }
+    dispatch(setSelectedPlacements(val));
   };
 
   const toggleName = () => {
     setNameExpanded(!nameExpanded);
   };
+
+  const placements = eventDetails?.location?.locationPlacements?.map((it: any) => {
+    return it;
+  });
 
   return (
     <Box maxWidth='lg'>
@@ -42,35 +54,46 @@ export const SelectPlacement = (): JSX.Element => {
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='name-content' id='name-header'>
           <Stack width='100%' direction='row' justifyContent='space-between' alignItems='center' spacing={2}>
             <Box>
-              <Typography sx={{ color: 'text.secondary', textTransform: 'uppercase' }}>3 placements available</Typography>
+              <Typography sx={{ color: 'text.secondary', textTransform: 'uppercase' }}>
+                {placements?.filter((it: any) => it.available).length > 1 ? (
+                  <>{placements?.filter((it: any) => it.available).length} PLACEMENTS AVAILABLE</>
+                ) : (
+                  <>{placements?.filter((it: any) => it.available).length} PLACEMENT AVAILABLE</>
+                )}
+              </Typography>
 
               <Typography variant='h6' component='h4'>
                 Full broadcast
               </Typography>
             </Box>
 
+            {/*
             <Typography sx={{ color: 'text.secondary', textTransform: 'uppercase', pr: 3 }}>
-              {!selectedPlacement ? '3 placements available' : selectedPlacement}
+              {!selectedPlacements ? placements.length + ' placements available' : selectedPlacements}
             </Typography>
+            */}
           </Stack>
         </AccordionSummary>
         <AccordionDetails sx={{ display: 'flex', pr: 4, pl: 4, pb: 4 }}>
-          <Stack spacing={12} direction='row'>
-            <Box sx={{ height: '250px', width: '300px' }}>
-              {selectedPlacement ? (
-                <Image sx={{ width: '100%', height: '100%' }} src={footballField} showLoading />
+          <Stack spacing={8} direction='row'>
+            <Box>
+              {selectedPlacements && eventDetails ? (
+                <Image fit='contain' src={eventDetails.location.imageUrl} showLoading />
               ) : (
-                <Image sx={{ width: '100%', height: '100%' }} src={footballFieldNoPlace} showLoading />
+                <BrokenImageIcon sx={{ color: grey[300], fontSize: 100 }} />
               )}
             </Box>
             <FormGroup>
-              <FormControlLabel
-                control={<Checkbox checked={selectedPlacement === 'Full stadium'} onChange={e => onSelectedPlacement(e, 'Full stadium')} />}
-                label='Full stadium'
-              />
-              <FormControlLabel control={<Checkbox disabled />} label='Stadium left (coming soon)' />
-              <FormControlLabel control={<Checkbox disabled />} label='Stadium center (coming soon)' />
-              <FormControlLabel control={<Checkbox disabled />} label='Stadium right (coming soon)' />
+              {placements?.map((item: any, index: any) => (
+                <FormControlLabel
+                  key={index}
+                  value={item.id}
+                  control={<Checkbox color='primary' onChange={onSelectedPlacements} />}
+                  label={item.name}
+                  disabled={!item.available}
+                  checked={selectedPlacements.includes(item.id)}
+                />
+              ))}
             </FormGroup>
           </Stack>
         </AccordionDetails>
@@ -85,11 +108,13 @@ export const SelectPlacement = (): JSX.Element => {
             </Typography>
           </Stack>
         </AccordionSummary>
+        {/*
         <AccordionDetails sx={{ display: 'flex', pr: 4, pl: 4, pb: 4 }}>
           <Stack spacing={12} direction='row'>
             More details here
           </Stack>
         </AccordionDetails>
+        */}
       </Accordion>
     </Box>
   );

@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, LinearProgress, Typography } from '@mui/material';
 import { grey } from '@mui/material/colors';
-import { EventOrdersTable, orderStatusesMapping } from './events/EventOrdersTable';
+import { EventOrdersTableComponent } from './events/components/EventOrdersTableComponent';
 import { loadOrders, ordersSelector } from '../state/ordersSlice';
 import { EventOrder, OrderStatus } from '../models/models';
+import { orderTypesMapping } from '../services/orderTypesMapping';
 import { AppDispatch } from '../state/store';
 
 export const Orders = (): JSX.Element => {
@@ -27,13 +28,16 @@ export const Orders = (): JSX.Element => {
   return (
     <Box sx={{ backgroundColor: grey[100] }}>
       <Typography variant='h5' sx={{ lineHeight: 1.5 }} pb={2}>
-        Orders {orderStatusesMapping[type as OrderStatus].label}
+        Orders {orderTypesMapping.find(it => it.status === type)!!.label}
       </Typography>
       {isLoading ? (
         <LinearProgress />
       ) : (
         <div style={{ width: '100%', marginBottom: '16px' }}>
-          <EventOrdersTable
+          <EventOrdersTableComponent
+            includeAdPlace={true}
+            includeBroadcastTime={false}
+            includeEvent={false}
             rowsPerPageOptions={[10, 15]}
             orders={orders}
             onClick={o => {

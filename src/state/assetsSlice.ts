@@ -63,6 +63,7 @@ export const assetsSlice = createSlice({
         state.savingAsset = false;
       })
       .addCase(fetchAssetsByQuery.pending, state => {
+        state.assets = [];
         state.isLoading = true;
         state.savingAssetDone = false;
       })

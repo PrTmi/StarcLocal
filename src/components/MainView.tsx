@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import { EventDetailsView } from './events/EventDetailsView';
 import { OrderDetailsView } from './events/OrderDetailsView';
 
-export const Main = () => {
+export const MainView = () => {
   const { instance, accounts } = useMsal();
   backendService.setMsalInstance(instance, accounts[0]);
 
@@ -24,7 +24,7 @@ export const Main = () => {
 
   useEffect(() => {
     if (location.pathname === '/') {
-      navigate('/assets');
+      navigate('/events');
     }
   }, []);
 

@@ -6,7 +6,7 @@ import { grey } from '@mui/material/colors';
 import { Transition } from '../../services/animation';
 
 type AssetsProps = {
-  onClose: () => void;
+  onClose: (refresh: boolean) => void;
   open: boolean;
   assetId: string;
   scroll: string;
@@ -31,7 +31,7 @@ export const AssetDetailsDialog = ({ onClose, open, assetId, scroll, clientId }:
     >
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar sx={{ backgroundColor: grey[800] }}>
-          <IconButton edge='start' color='inherit' onClick={onClose} aria-label='close' sx={{ color: '#ffffff' }}>
+          <IconButton edge='start' color='inherit' onClick={e => onClose(false)} aria-label='close' sx={{ color: '#ffffff' }}>
             <CloseIcon />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant='h6' component='div'>

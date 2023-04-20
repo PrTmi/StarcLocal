@@ -17,6 +17,7 @@ export const Login = (): JSX.Element => {
   const { isSuccess, isError, errorMessage } = useSelector(userSelector);
 
   useEffect(() => {
+    console.log('udr');
     dispatch(clearState());
   }, []);
 

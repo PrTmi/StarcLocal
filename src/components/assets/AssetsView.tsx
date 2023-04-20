@@ -12,13 +12,14 @@ import { AssetDetailsDialog } from './AssetDetailsDialog';
 import { AssetsTable } from './AssetsTable';
 import { AugmentingProssessDialog } from './AugmentingProssesDialog';
 import { clientsSelector, fetchClientsByQuery } from '../../state/clientsSlice';
+import { useSearchParams } from 'react-router-dom';
 import { AppDispatch } from '../../state/store';
 
 export const AssetsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const [client, setClient] = React.useState('');
+  const urlParams = useSearchParams()[0];
+  const [client, setClient] = React.useState(''); //clientId ? clientId :
   const { clients } = useSelector(clientsSelector);
-
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [assetId, setAssetId] = useState<string>('new');
   const [scroll, setScroll] = React.useState('paper');
@@ -62,14 +63,15 @@ export const AssetsView = (): JSX.Element => {
     refreshAssets(client);
   };
 
-  const closeDetailsDialog = () => {
+  const closeDetailsDialog = (refresh: boolean) => {
     setDetailsOpen(false);
-    refreshAssets(client);
+    if (refresh) {
+      refreshAssets(client);
+    }
   };
 
   const closeAugmentAssetDialog = () => {
     setAugmentAssetOpen(false);
-    refreshAssets(client);
   };
 
   const closeAugmentingProcessDialog = () => {
@@ -77,8 +79,13 @@ export const AssetsView = (): JSX.Element => {
   };
 
   useEffect(() => {
-    dispatch(fetchClientsByQuery());
-    refreshAssets('');
+    const load = async () => {
+      dispatch(fetchClientsByQuery());
+      const clientId = urlParams.has('clientId') ? urlParams.get('clientId')!! : '';
+      setClient(clientId);
+      refreshAssets(clientId);
+    };
+    load();
   }, []);
 
   const showStatus = (asset: Asset) => {
@@ -102,7 +109,7 @@ export const AssetsView = (): JSX.Element => {
 
           <FormControl sx={{ ml: 3, minWidth: 120, py: 0 }} size='small'>
             <Select value={client} onChange={handleChange} displayEmpty inputProps={{ 'aria-label': 'Without label' }}>
-              <MenuItem value=''>All clients</MenuItem>
+              <MenuItem value=''>All advertisers</MenuItem>
               {clients.map((c: Client) => (
                 <MenuItem key={c.id!!} value={c.id!!}>
                   {c.name}
@@ -112,7 +119,7 @@ export const AssetsView = (): JSX.Element => {
           </FormControl>
         </Stack>
 
-        <Button variant='outlined' onClick={createAsset}>
+        <Button variant='outlined' onClick={createAsset} disabled={clients.length === 0}>
           New asset
         </Button>
       </Stack>
@@ -155,7 +162,7 @@ export const AssetsView = (): JSX.Element => {
 
       <AugmentAssetDialog asset={selectedAsset} onClose={closeAugmentAssetDialog} open={augmentAssetDialogOpen} />
       <AugmentingProssessDialog asset={selectedAsset} onClose={closeAugmentingProcessDialog} open={augmentingProcessDialogOpen} />
-      <AssetDetailsDialog onClose={closeDetailsDialog} open={detailsOpen} assetId={assetId} scroll={scroll} clientId={client} />
+      <AssetDetailsDialog onClose={refresh => closeDetailsDialog(refresh)} open={detailsOpen} assetId={assetId} scroll={scroll} clientId={client} />
     </>
   );
 };

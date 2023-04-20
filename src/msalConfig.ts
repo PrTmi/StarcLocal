@@ -12,7 +12,12 @@ const configTemplate = {
 };
 const redirectsMap = {
   'localhost:3000': 'http://localhost:3000',
-  'starc-frontend.azurewebsites.net': 'https://starc-frontend.azurewebsites.net'
+  'starc-frontend.azurewebsites.net': 'https://starc-frontend.azurewebsites.net',
+  'dev.starc-dev.no': 'https://dev.starc-dev.no',
+  'rel.starc-dev.no': 'https://rel.starc-dev.no',
+  'stg.starc-dev.no': 'https://stg.starc-dev.no',
+  'demo.starc-dev.no': 'https://demo.starc-dev.no',
+  'dev-starc-wa-starc-frontend-we.azurewebsites.net': 'https://dev-starc-wa-starc-frontend-we.azurewebsites.net'
 } as any;
 
 export const loginRequest = {

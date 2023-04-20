@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Menu, MenuItem } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridColumnHeaderParams, GridRenderCellParams } from '@mui/x-data-grid';
 import { Client } from '../../models/models';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import { ClickableTableCell } from '../shared/ui/ClickableTableCell';
+import { orderTypesMapping } from '../../services/orderTypesMapping';
+import Tooltip from '@mui/material/Tooltip';
+import { grey } from '@mui/material/colors';
+import { FolderOpen } from '@mui/icons-material';
 
 type ClientsTableProps = {
   clients: Client[];
@@ -65,7 +69,7 @@ export const ClientsTable = ({ clients, onEdit, onArchive, onUnArchive, onView, 
   };
 
   const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Client', resizable: false, flex: 0.1 },
+    { field: 'name', headerName: 'Advertisers', resizable: false, flex: 0.1 },
     {
       field: 'assetsCount',
       headerName: 'Assets',
@@ -74,61 +78,61 @@ export const ClientsTable = ({ clients, onEdit, onArchive, onUnArchive, onView, 
       renderCell: (params: GridRenderCellParams) => {
         return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/assets')} param={params.row.assetsCount} />;
       }
-    },
-    {
-      field: 'pendingOrdersCount',
-      headerName: 'Pending orders',
-      resizable: false,
-      flex: 0.1,
-      renderCell: (params: GridRenderCellParams) => {
-        return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/requires_approval')} param={params.row.pendingOrdersCount} />;
-      }
-    },
-
-    {
-      field: 'ordersInProductionCount',
-      headerName: 'Orders in production',
-      resizable: false,
-      flex: 0.1,
-      renderCell: (params: GridRenderCellParams) => {
-        return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/approved')} param={params.row.ordersInProductionCount} />;
-      }
-    },
-
-    {
-      field: 'ordersDeliveredCount',
-      headerName: 'Orders delivered',
-      resizable: false,
-      flex: 0.1,
-      renderCell: (params: GridRenderCellParams) => {
-        return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/delivered')} param={params.row.ordersDeliveredCount} />;
-      }
-    },
-
-    {
-      field: 'amountOfArchivedOrders',
-      headerName: 'Archived orders',
-      resizable: false,
-      flex: 0.1,
-      renderCell: (params: GridRenderCellParams) => {
-        return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/archived')} param={params.row.archivedOrdersCount} />;
-      }
-    },
-    {
-      field: 'actions',
-      headerName: '',
-      resizable: false,
-      sortable: false,
-      width: 60,
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <IconButton color='inherit' onClick={e => handleMenuClick(e, params.row as Client)}>
-            <MoreVertIcon />
-          </IconButton>
-        );
-      }
     }
   ];
+
+  for (const m of orderTypesMapping.filter(it => it.showInTable)) {
+    columns.push({
+      field: m.status + 'OrdersCount',
+      sortable: false,
+      headerName: m.label,
+      resizable: false,
+      flex: 0.1,
+      filterable: false,
+      renderHeader: (params: GridColumnHeaderParams) => (
+        <Tooltip title={m.tooltipLabel} placement='top'>
+          <div style={{ color: grey[700], lineHeight: 5.2, height: '56px', verticalAlign: 'middle' }}>{m.icon}</div>
+        </Tooltip>
+      ),
+      renderCell: (params: GridRenderCellParams) => {
+        // @ts-ignore
+        const count = params.row.orderStatusCounts.find(count => count.status === m.status);
+        return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/' + m.status)} param={count.count} />;
+      }
+    });
+  }
+  columns.push({
+    field: 'amountOfArchivedOrders',
+    sortable: false,
+    headerName: 'Archived orders',
+    resizable: false,
+    flex: 0.1,
+    filterable: false,
+    renderHeader: (params: GridColumnHeaderParams) => (
+      <Tooltip title='Arhived orders' placement='top'>
+        <div style={{ color: grey[700], lineHeight: 5.2, height: '56px', verticalAlign: 'middle' }}>
+          <FolderOpen />
+        </div>
+      </Tooltip>
+    ),
+    renderCell: (params: GridRenderCellParams) => {
+      return <ClickableTableCell onDetails={() => onDetails(params.row as Client, '/orders/archived')} param={params.row.archivedOrdersCount} />;
+    }
+  });
+  columns.push({
+    field: 'actions',
+    headerName: '',
+    resizable: false,
+    sortable: false,
+    width: 60,
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <IconButton color='inherit' onClick={e => handleMenuClick(e, params.row as Client)}>
+          <MoreVertIcon />
+        </IconButton>
+      );
+    }
+  });
 
   return (
     <>
@@ -166,7 +170,7 @@ export const ClientsTable = ({ clients, onEdit, onArchive, onUnArchive, onView, 
         rowHeight={80}
         initialState={{
           sorting: {
-            sortModel: [{ field: 'dateCreated', sort: 'desc' }]
+            sortModel: [{ field: 'createdAt', sort: 'desc' }]
           }
         }}
       />

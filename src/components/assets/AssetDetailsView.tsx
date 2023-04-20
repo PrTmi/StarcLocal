@@ -4,6 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { AppDispatch } from '../../state/store';
 import {
   Alert,
   Box,
@@ -24,23 +25,20 @@ import { useDropzone } from 'react-dropzone';
 import { useDispatch, useSelector } from 'react-redux';
 import { assetsSelector, fetchAssetDetails, saveAsset } from '../../state/assetsSlice';
 import { LoadingButton } from '@mui/lab';
-// @ts-ignore
-import { Image } from 'mui-image';
 import { clientsSelector } from '../../state/clientsSlice';
 import { Client } from '../../models/models';
-import { AppDispatch } from '../../state/store';
+// @ts-ignore
+import { Image } from 'mui-image';
 
 type AssetDetailsProps = {
-  onClose: () => void;
+  onClose: (refresh: boolean) => void;
   assetId: string;
   clientId: string;
 };
 
 export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsProps): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-
   const { clients } = useSelector(clientsSelector);
-
   const [client, setClient] = React.useState(clientId);
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -50,11 +48,7 @@ export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsPro
   const [selectedFileName, setSelectedFileName] = useState<String>('');
   const [image, setImage] = useState<File | null>(null);
   const { assetDetails, savingAsset, savingAssetDone, isLoading } = useSelector(assetsSelector);
-
-  const [clientsExpanded, setClientsExpanded] = React.useState<boolean>(true);
-  const [nameExpanded, setNameExpanded] = React.useState<boolean>(true);
-  const [imageExpanded, setImageExpanded] = React.useState<boolean>(false);
-
+  const [expandedPanel, setExpandedPanel] = useState<boolean | string>('client' ? assetId === 'new' : '');
   const [assetName, setAssetName] = useState<string>('');
   const [assetNameTouched, setAssetNameTouched] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -67,7 +61,7 @@ export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsPro
 
   useEffect(() => {
     if (savingAssetDone) {
-      onClose();
+      onClose(true);
     }
   }, [savingAssetDone]);
 
@@ -106,64 +100,80 @@ export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsPro
     loadPreview(acceptedFiles[0]);
   }, []);
 
-  const { getRootProps, getInputProps, open } = useDropzone({ onDrop, accept: 'image/png' });
+  const { getRootProps, getInputProps, open } = useDropzone({
+    onDrop,
+    accept: 'image/png',
+    noClick: true,
+    noKeyboard: true
+  });
 
   const handleSave = async () => {
     await dispatch(saveAsset({ id: assetDetails.id, name: assetName, image: image, clientId: client }));
-    // closeDialog();
+    //closeDialog();
+  };
+  const handlePanelChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpandedPanel(newExpanded ? panel : false);
   };
 
-  const toggleClients = () => {
-    setClientsExpanded(!clientsExpanded);
-  };
-
-  const toggleName = () => {
-    setNameExpanded(!nameExpanded);
-  };
-
-  const toggleImage = () => {
-    setImageExpanded(!imageExpanded);
+  const selectedClientName = () => {
+    return clients.find((it: Client) => {
+      return it.id === client;
+    }).name;
   };
 
   const closeDialog = () => {
     setPreview(null);
     setChanged(false);
-    onClose();
+    onClose(false);
   };
 
   return (
     <Container component='main' maxWidth='md' sx={{ pt: 12 }}>
       {!isLoading ? (
         <>
-          <Accordion sx={{ pt: 2, pb: 2 }} expanded={clientsExpanded} onChange={() => toggleClients()}>
+          <Accordion
+            sx={{ pt: 2, pb: 2 }}
+            expanded={expandedPanel === 'client' || expandedPanel === true}
+            onChange={handlePanelChange('client')}
+            disabled={!!client && !!assetDetails?.name}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='clients-content' id='clients-header'>
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>Client</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Select the client that has ownership of this asset</Typography>
+              <Typography sx={{ width: '33%', flexShrink: 0 }}>Advertiser</Typography>
+              <Typography sx={{ color: 'text.secondary' }}>
+                {client && clients != null && (!expandedPanel || expandedPanel === 'assetName' || expandedPanel === 'image')
+                  ? selectedClientName()
+                  : 'Select the advertiser that has ownership of this asset'}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <FormControl sx={{ width: 300 }}>
-                <InputLabel id='demo-simple-select-label'>Client</InputLabel>
+                <InputLabel id='demo-simple-select-label'>Advertiser</InputLabel>
 
-                <Select value={client} onChange={handleChange} label='Client'>
-                  {clients.map((c: Client) => (
-                    <MenuItem key={c.id!!} value={c.id!!}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
+                <Select value={client} onChange={handleChange} label='Advertiser'>
+                  {clients &&
+                    clients.map((c: Client) => (
+                      <MenuItem key={c.id!!} value={c.id!!}>
+                        {c.name}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </AccordionDetails>
           </Accordion>
 
-          <Accordion sx={{ pt: 2, pb: 2 }} expanded={nameExpanded} onChange={() => toggleName()}>
+          <Accordion sx={{ pt: 2, pb: 2 }} expanded={expandedPanel === 'assetName'} onChange={handlePanelChange('assetName')}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='name-content' id='name-header'>
               <Typography sx={{ width: '33%', flexShrink: 0 }}>Asset name</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Descriptive name for your asset</Typography>
+
+              <Typography sx={{ color: 'text.secondary' }}>
+                {(expandedPanel && expandedPanel !== 'client' && expandedPanel !== 'image') || assetName.length === 0
+                  ? 'Add a descriptive name for the asset'
+                  : assetName}
+              </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <FormControl sx={{ width: 300 }}>
                 <TextField
-                  focused
                   autoFocus
                   variant='standard'
                   required
@@ -200,16 +210,22 @@ export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsPro
               </FormControl>
             </AccordionDetails>
           </Accordion>
+
           <Accordion
             sx={{ pt: 2, pb: 2 }}
-            expanded={assetDetails?.status !== 'ready_for_augmentation' ? imageExpanded : !imageExpanded}
-            onChange={() => toggleImage()}
+            expanded={expandedPanel === 'image'}
+            onChange={handlePanelChange('image')}
             disabled={assetDetails?.status !== 'ready_for_augmentation'}
           >
+            {/*            expanded={assetDetails?.status !== 'ready_for_augmentation' ? imageExpanded : !imageExpanded}
+             */}
             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='image-content' id='image-header'>
               <Typography sx={{ width: '33%', flexShrink: 0 }}>Asset file</Typography>
+
               <Typography sx={{ color: 'text.secondary' }}>
-                {assetDetails?.status !== 'ready_for_augmentation' ? selectedFileName : 'Upload a supported asset file (.png)'}
+                {(expandedPanel && expandedPanel !== 'client' && expandedPanel !== 'assetName') || !selectedFileName
+                  ? 'Upload a supported asset file (.png)'
+                  : selectedFileName}
               </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ display: 'flex', justifyContent: 'center', pb: 4, flexDirection: 'column' }}>

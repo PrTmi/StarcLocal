@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Main } from './components/Main';
+import { MainView } from './components/MainView';
 import { MsalAuthenticationTemplate } from '@azure/msal-react';
 import { InteractionType } from '@azure/msal-browser';
 import { loginRequest } from './msalConfig';
@@ -23,7 +23,7 @@ const App = () => {
             path='/*'
             element={
               <MsalAuthenticationTemplate interactionType={InteractionType.Redirect} authenticationRequest={loginRequest}>
-                <Main />
+                <MainView />
               </MsalAuthenticationTemplate>
             }
           />

@@ -20,3 +20,21 @@ video::-webkit-media-controls-panel {
 .MuiDataGrid-root .MuiDataGrid-cell {
     padding:0 16px!important;
 }
+
+/*Change accordion disabled background color*/
+.MuiAccordion-root.Mui-disabled {
+    background-color: #f7f7f7!important;
+}
+
+.MuiAccordion-root.Mui-expanded {
+    margin: 0!important;
+}
+
+.MuiAccordion-root.Mui-expanded:before {
+   opacity: 1!important;
+}
+
+.MuiButtonBase-root.MuiAccordionSummary-root.Mui-disabled {
+    opacity: 0.6;
+}
+

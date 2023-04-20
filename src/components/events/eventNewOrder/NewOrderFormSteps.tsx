@@ -4,9 +4,9 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import { ListOfAssets } from './ListOfAssets';
-import { SelectPlacement } from './SelectPlacement';
-import { ConfirmOrder } from './ConfirmOrder';
+import { ListOfAssetsView } from './ListOfAssetsView';
+import { SelectPlacementView } from './SelectPlacementView';
+import { ConfirmSubmitOrderView } from './ConfirmSubmitOrderView';
 import { Event } from '../../../models/models';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,17 +14,17 @@ import { ordersSelector } from '../../../state/ordersSlice';
 import { Fade } from '@mui/material';
 
 type NewOrderProps = {
-  onClose: () => void;
+  onClose: (refresh: boolean) => void;
   onVisibilityChange: (visible: boolean) => void;
   event: Event;
 };
 
 const steps = ['Select asset', 'Select placement', 'Confirm order'];
 
-export const NewOrderForm = ({ onClose, event, onVisibilityChange }: NewOrderProps): JSX.Element => {
+export const NewOrderFormSteps = ({ onClose, event, onVisibilityChange }: NewOrderProps): JSX.Element => {
   const [activeStep, setActiveStep] = useState(0);
   const { selectedAsset } = useSelector(ordersSelector);
-  const { selectedPlacement } = useSelector(ordersSelector);
+  const { selectedPlacements } = useSelector(ordersSelector);
   const [stepperHidden, setStepperHidden] = useState(false);
 
   const handleNext = () => {
@@ -39,8 +39,8 @@ export const NewOrderForm = ({ onClose, event, onVisibilityChange }: NewOrderPro
     onVisibilityChange(activeStep < 2);
   }, [activeStep]);
 
-  const closeDialog = () => {
-    onClose();
+  const closeDialog = (refresh: boolean) => {
+    onClose(refresh);
   };
   const { savingOrder } = useSelector(ordersSelector);
 
@@ -68,12 +68,12 @@ export const NewOrderForm = ({ onClose, event, onVisibilityChange }: NewOrderPro
       </Fade>
       <Box sx={{ flex: 1 }}>
         <Box>
-          {activeStep === 0 && <ListOfAssets />}
-          {activeStep === 1 && <SelectPlacement />}
-          {activeStep === 2 && <ConfirmOrder event={event} goBack={handleBack} onClose={closeDialog} />}
+          {activeStep === 0 && <ListOfAssetsView />}
+          {activeStep === 1 && <SelectPlacementView />}
+          {activeStep === 2 && <ConfirmSubmitOrderView event={event} goBack={handleBack} onClose={closeDialog} />}
           {activeStep < 2 ? (
             <Box sx={{ display: 'flex', pt: 2 }}>
-              <Button onClick={closeDialog} sx={{ mr: 1 }}>
+              <Button onClick={e => closeDialog(false)} sx={{ mr: 1 }}>
                 Cancel
               </Button>
               <Box sx={{ flex: '1 1 auto' }} />
@@ -83,7 +83,7 @@ export const NewOrderForm = ({ onClose, event, onVisibilityChange }: NewOrderPro
               <Button
                 variant='contained'
                 onClick={handleNext}
-                disabled={(!selectedAsset && activeStep === 0) || (!selectedPlacement && !selectedPlacement && activeStep === 1)}
+                disabled={(!selectedAsset && activeStep === 0) || (selectedPlacements.length === 0 && activeStep === 1)}
               >
                 {activeStep === steps.length - 1 ? 'Complete order' : 'Continue'}
               </Button>

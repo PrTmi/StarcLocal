@@ -24,6 +24,10 @@ export const fetchEventOrders = createAsyncThunk(`${prefix}/fetchOrders`, async 
   return await backendService.loadEventOrders(id);
 });
 
+export const syncEventOrders = createAsyncThunk('eventDetails/sync', async (id: string) => {
+  return await backendService.syncEventOrders(id);
+});
+
 export const eventsSlice = createSlice({
   name: prefix,
   initialState,
@@ -51,6 +55,9 @@ export const eventsSlice = createSlice({
       .addCase(fetchEventOrders.fulfilled, (state, action) => {
         state.eventOrders = action.payload;
         state.isLoadingOrders = false;
+      })
+      .addCase(syncEventOrders.fulfilled, (state, action) => {
+        state.eventDetails = Object.assign({}, state.eventDetails, { isOrdersAssetSynchronizing: true });
       });
   }
 });

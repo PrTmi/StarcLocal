@@ -44,7 +44,7 @@ export const AssetsTable = ({ assets, onAugmentAsset, onViewAsset, onEdit, onArc
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [pageSize, setPageSize] = React.useState(5);
+  const [pageSize, setPageSize] = React.useState(10);
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>, a: Asset) => {
     setSelectedAsset(a);
@@ -100,7 +100,7 @@ export const AssetsTable = ({ assets, onAugmentAsset, onViewAsset, onEdit, onArc
       renderCell: (params: GridRenderCellParams) => {
         return params.row.imageUrl ? (
           <div style={{ height: '60px', width: 'auto' }}>
-            <Image fit='contain' src={params.row.imageUrl} showLoading />
+            <Image fit='contain' src={params.row.imageUrl} duration={500} />
           </div>
         ) : (
           <BrokenImageIcon sx={{ color: grey[400], fontSize: 60 }} />
@@ -108,12 +108,12 @@ export const AssetsTable = ({ assets, onAugmentAsset, onViewAsset, onEdit, onArc
       }
     },
     {
-      field: 'dateCreated',
+      field: 'createdAt',
       headerName: 'Created',
       resizable: false,
       flex: 0.1,
       renderCell: (params: GridRenderCellParams) => {
-        return formatDateTime(params.row.dateCreated);
+        return formatDateTime(params.row.createdAt);
       }
     },
     { field: 'fileFullName', headerName: 'File name', resizable: false, flex: 0.1 },
@@ -194,7 +194,7 @@ export const AssetsTable = ({ assets, onAugmentAsset, onViewAsset, onEdit, onArc
         rowHeight={80}
         initialState={{
           sorting: {
-            sortModel: [{ field: 'dateCreated', sort: 'desc' }]
+            sortModel: [{ field: 'createdAt', sort: 'desc' }]
           }
         }}
       />
