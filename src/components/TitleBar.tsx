@@ -12,6 +12,7 @@ import { loadUserInfo, userSelector } from '../state/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMsal } from '@azure/msal-react';
 import logoImage from '../images/logo-black.svg';
+import { AppDispatch } from '../state/store';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -37,7 +38,7 @@ type TitleBarProps = {
 };
 
 export const TitleBar = ({ toggleDrawer, open }: TitleBarProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { userInfo } = useSelector(userSelector);
   const { instance, accounts } = useMsal();
 

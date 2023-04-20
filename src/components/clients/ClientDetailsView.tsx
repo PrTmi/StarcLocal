@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clientsSelector, fetchClientDetails, saveClient } from '../../state/clientsSlice';
 import { LoadingButton } from '@mui/lab';
 import { ChangeEvent } from 'react';
+import { AppDispatch } from '../../state/store';
 
 type ClientDetailsProps = {
   onClose: () => void;
@@ -17,7 +18,7 @@ type ClientDetailsProps = {
 };
 
 export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { clientDetails, savingClient, savingClientDone, isLoading } = useSelector(clientsSelector);
   const [nameExpanded, setNameExpanded] = useState<boolean>(true);
   const [emailExpanded, setEmailExpanded] = useState<boolean>(true);
@@ -50,6 +51,7 @@ export const ClientDetailsView = ({ onClose, clientId }: ClientDetailsProps): JS
   function isValidEmail(email: string) {
     return /\S+@\S+\.\S+/.test(email);
   }
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (!isValidEmail(event.target.value)) {
       setError('Email is invalid');

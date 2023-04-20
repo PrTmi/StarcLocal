@@ -14,6 +14,7 @@ import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import { ordersSelector, setSelectedAsset } from '../../../state/ordersSlice';
 // @ts-ignore
 import { Image } from 'mui-image';
+import { AppDispatch } from '../../../state/store';
 
 const CustomizedListItemButton = styled(ListItemButton)(() => ({
   '&.MuiListItemButton-root': {
@@ -29,7 +30,7 @@ const CustomizedListItemButton = styled(ListItemButton)(() => ({
 }));
 
 export const ListOfAssets = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { assets } = useSelector(assetsSelector);
   const { selectedAsset } = useSelector(ordersSelector);
 

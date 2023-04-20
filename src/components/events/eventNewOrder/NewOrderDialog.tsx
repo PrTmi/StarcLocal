@@ -10,6 +10,7 @@ import { Transition } from '../../../services/animation';
 import Container from '@mui/material/Container';
 import { NewOrderForm } from './NewOrderForm';
 import { EventDetailsSideBar } from './EventDetailsSideBar';
+import { AppDispatch } from '../../../state/store';
 
 type EventProps = {
   onClose: () => void;
@@ -18,7 +19,7 @@ type EventProps = {
 };
 
 export const NewOrderDialog = ({ onClose, open, event }: EventProps, sidebar: boolean): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [sideBarVisible, setSideBarVisible] = useState<boolean>(true);
 
   useEffect(() => {

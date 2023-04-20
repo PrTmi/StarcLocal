@@ -4,11 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { resetPassword, userSelector } from '../../state/userSlice';
 import logoImage from '../../images/logo.svg';
+import { AppDispatch } from '../../state/store';
 
 export const ForgotPassword = (): JSX.Element => {
   const [username, setUsername] = useState<string>('');
   const [usernameTouched, setUsernameTouched] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const { isSuccess, isError, errorMessage } = useSelector(userSelector);

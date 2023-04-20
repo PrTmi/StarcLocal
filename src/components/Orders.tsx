@@ -6,11 +6,12 @@ import { grey } from '@mui/material/colors';
 import { EventOrdersTable, orderStatusesMapping } from './events/EventOrdersTable';
 import { loadOrders, ordersSelector } from '../state/ordersSlice';
 import { EventOrder, OrderStatus } from '../models/models';
+import { AppDispatch } from '../state/store';
 
 export const Orders = (): JSX.Element => {
   const params = useParams();
   const type = params['type'];
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const { orders, isLoading } = useSelector(ordersSelector);

@@ -12,9 +12,10 @@ import { AssetDetailsDialog } from './AssetDetailsDialog';
 import { AssetsTable } from './AssetsTable';
 import { AugmentingProssessDialog } from './AugmentingProssesDialog';
 import { clientsSelector, fetchClientsByQuery } from '../../state/clientsSlice';
+import { AppDispatch } from '../../state/store';
 
 export const Assets = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [client, setClient] = React.useState('');
   const { clients } = useSelector(clientsSelector);
 

@@ -12,9 +12,10 @@ import { ordersSelector, setSelectedPlacement } from '../../../state/ordersSlice
 
 // @ts-ignore
 import { Image } from 'mui-image';
+import { AppDispatch } from '../../../state/store';
 
 export const SelectPlacement = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [nameExpanded, setNameExpanded] = React.useState<boolean>(true);
 

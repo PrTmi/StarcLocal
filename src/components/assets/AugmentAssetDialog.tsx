@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 // @ts-ignore
 import { Image } from 'mui-image';
+import { AppDispatch } from '../../state/store';
 
 type AugmentAssetDialogProps = {
   onClose: () => void;
@@ -14,7 +15,7 @@ type AugmentAssetDialogProps = {
 };
 
 export const AugmentAssetDialog = ({ onClose, asset, open }: AugmentAssetDialogProps): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleAugment = async () => {
     if (asset?.id) {

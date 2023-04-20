@@ -28,6 +28,7 @@ import { LoadingButton } from '@mui/lab';
 import { Image } from 'mui-image';
 import { clientsSelector } from '../../state/clientsSlice';
 import { Client } from '../../models/models';
+import { AppDispatch } from '../../state/store';
 
 type AssetDetailsProps = {
   onClose: () => void;
@@ -36,7 +37,7 @@ type AssetDetailsProps = {
 };
 
 export const AssetDetailsView = ({ onClose, assetId, clientId }: AssetDetailsProps): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { clients } = useSelector(clientsSelector);
 

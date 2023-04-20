@@ -12,13 +12,14 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { EventOrdersTable } from './EventOrdersTable';
 import { EventOrder } from '../../models/models';
 import { NewOrderDialog } from './eventNewOrder/NewOrderDialog';
+import { resetOrderSave } from '../../state/ordersSlice';
+import { AppDispatch } from '../../state/store';
 
 // @ts-ignore
 import { Image } from 'mui-image';
-import { resetOrderSave } from '../../state/ordersSlice';
 
 export const EventDetails = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const params = useParams();
   const id = params['id'];

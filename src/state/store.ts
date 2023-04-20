@@ -5,6 +5,8 @@ import ordersReducer from './ordersSlice';
 import eventsReducer from './eventsSlice';
 import clientsReducer from './clientsSlice';
 
+export type AppDispatch = typeof store.dispatch;
+
 export const store = configureStore({
   reducer: {
     user: userReducer,

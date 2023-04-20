@@ -13,6 +13,7 @@ import { Event, EventOrder } from '../../../models/models';
 import Button from '@mui/material/Button';
 import { AssetDetailsComponent } from '../../shared/AssetDetailsComponent';
 import { PlacementDetailsComponent } from '../../shared/PlacementDetailsComponent';
+import { AppDispatch } from '../../../state/store';
 
 type ConfirmOrderProps = {
   event: Event;
@@ -21,7 +22,7 @@ type ConfirmOrderProps = {
 };
 
 export const ConfirmOrder = ({ event, goBack, onClose }: ConfirmOrderProps): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { selectedAsset, selectedPlacement, savingOrder } = useSelector(ordersSelector);
 
   const [saved, setSaved] = useState<boolean>(false);

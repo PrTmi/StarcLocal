@@ -16,6 +16,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import List from '@mui/material/List';
 import { Graph } from './Graph';
 import Tooltip from '@mui/material/Tooltip';
+import { AppDispatch } from '../../state/store';
 
 export const formatSeconds = (seconds: number) => {
   return new Date(seconds * 1000).toISOString().substr(14, 5);
@@ -30,7 +31,7 @@ export const canGenerateReport = (order: EventOrder) => {
 };
 
 export const OrderDetails = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const params = useParams();
   const id = params['id'];

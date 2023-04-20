@@ -18,6 +18,7 @@ import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import GroupIcon from '@mui/icons-material/Group';
 import { Skeleton } from '@mui/material';
+import { AppDispatch } from '../state/store';
 
 const drawerWidth = 320;
 
@@ -62,7 +63,7 @@ export const orderTypesMapping = {
 export const MainMenu = ({ open }: MenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { ordersStats, isStatsLoading } = useSelector(ordersSelector);
 

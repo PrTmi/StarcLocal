@@ -14,9 +14,10 @@ import GroupIcon from '@mui/icons-material/Group';
 import { ClientsTable } from './ClientsTable';
 import { EmptyStateComponent } from '../shared/EmptyStateComponent';
 import { useNavigate } from 'react-router-dom';
+import { AppDispatch } from '../../state/store';
 
 export const Clients = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const [clientId, setClientId] = useState<string>('new');
