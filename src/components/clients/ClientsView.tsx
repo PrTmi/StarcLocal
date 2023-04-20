@@ -16,7 +16,7 @@ import { EmptyStateComponent } from '../shared/EmptyStateComponent';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../state/store';
 
-export const Clients = (): JSX.Element => {
+export const ClientsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 

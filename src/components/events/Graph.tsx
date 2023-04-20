@@ -3,7 +3,7 @@ import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Fill
 import { Line } from 'react-chartjs-2';
 import { OrderReport } from '../../models/models';
 import { getRelativePosition } from 'chart.js/helpers';
-import { formatSeconds } from './OrderDetails';
+import { formatSeconds } from './OrderDetailsView';
 
 ChartJS.register(LinearScale, LineElement, Tooltip, PointElement, Filler);
 

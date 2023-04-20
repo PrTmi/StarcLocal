@@ -14,7 +14,7 @@ import { AugmentingProssessDialog } from './AugmentingProssesDialog';
 import { clientsSelector, fetchClientsByQuery } from '../../state/clientsSlice';
 import { AppDispatch } from '../../state/store';
 
-export const Assets = (): JSX.Element => {
+export const AssetsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const [client, setClient] = React.useState('');
   const { clients } = useSelector(clientsSelector);

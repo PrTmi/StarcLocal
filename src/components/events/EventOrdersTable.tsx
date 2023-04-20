@@ -4,7 +4,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridRowModel } from '@mui/x
 import { EventOrder, OrderStatus } from '../../models/models';
 import { blue, grey, orange, green } from '@mui/material/colors';
 import { formatDate, formatDateTime, formatTime } from '../../services/formatting';
-import { canGenerateReport } from './OrderDetails';
+import { canGenerateReport } from './OrderDetailsView';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import Tooltip from '@mui/material/Tooltip';
 

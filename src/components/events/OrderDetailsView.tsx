@@ -30,7 +30,7 @@ export const canGenerateReport = (order: EventOrder) => {
   );
 };
 
-export const OrderDetails = (): JSX.Element => {
+export const OrderDetailsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const params = useParams();

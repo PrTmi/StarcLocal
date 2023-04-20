@@ -9,7 +9,7 @@ import { NewOrderDialog } from './eventNewOrder/NewOrderDialog';
 import { resetOrderSave } from '../../state/ordersSlice';
 import { AppDispatch } from '../../state/store';
 
-export const Events = (): JSX.Element => {
+export const EventsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { events, isLoading } = useSelector(eventsSelector);

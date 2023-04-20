@@ -18,7 +18,7 @@ import { AppDispatch } from '../../state/store';
 // @ts-ignore
 import { Image } from 'mui-image';
 
-export const EventDetails = (): JSX.Element => {
+export const EventDetailsView = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const params = useParams();

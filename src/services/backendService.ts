@@ -103,7 +103,7 @@ class BackendService {
     return Promise.resolve({ accountName: decoded.name });
   };
 
-  // Clients
+  // ClientsView
   saveClient = async (id: string | null, name: string, contactEmail: string): Promise<void> => {
     const request = {
       name: name,
@@ -147,7 +147,7 @@ class BackendService {
     });
   }
 
-  // Assets
+  // AssetsView
   archiveAsset = (id: String): Promise<void> => {
     return this.axios!.get(`${this.baseUrl}/assets/${id}/archive`);
   };
@@ -208,7 +208,7 @@ class BackendService {
     });
   }
 
-  // Events
+  // EventsView
   loadEvents = async (query: any): Promise<Event[]> => {
     try {
       return await this.axios!.get<Event[]>(`${this.baseUrl}/events`).then((it: AxiosResponse) => {
